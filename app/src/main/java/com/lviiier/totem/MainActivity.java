@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     int nmsRet = 0;
     String mStrPrinter = "PRT001";
 
+
+
     WebView myWebView;
     ServerSocket serverSocket;
     ServerSocket serverSocket2;
