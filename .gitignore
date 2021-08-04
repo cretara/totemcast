@@ -1,0 +1,11 @@
+/.idea/
+/.gradle/
+/totemapk.iml
+/Totem.iml
+/TotemChild.iml
+
+# Project exclude paths
+/build/
+/app/build/
+/release/preprodtotemcast.apk
+/release/totem_dev2.apk
