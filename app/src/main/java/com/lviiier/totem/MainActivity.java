@@ -58,7 +58,7 @@ import npi.sdk.data.NInt;
 
 public class MainActivity extends AppCompatActivity {
     boolean ConnessioneAttiva = false;
-    String baseUrl = "https://pediatotem.it";
+    String baseUrl = "http://pediatotem.it";
     String paginatotem = baseUrl + "/pediacast/index.html";
     String sottopagina = "totem";
 
