@@ -84,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
     ServerSocket serverSocket;
     ServerSocket serverSocket2;
 
-    String foldervideo = "/storage/sdcard0/Download/";
+    //    String foldervideo = "/storage/sdcard0/Download/";
+    String foldervideo = "/storage/emulated/0/Download/";
     List<String> FileScaricati = new ArrayList<>();
     File file[];
     String s = "";
@@ -549,6 +550,7 @@ public class MainActivity extends AppCompatActivity {
 //            Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
             InputStream input = new BufferedInputStream(url.openStream());
             OutputStream output = new FileOutputStream(foldervideo + nomefileSrv);
+
             byte data[] = new byte[1024];
             long total = 0;
             while ((count = input.read(data)) != -1) {
@@ -679,8 +681,10 @@ public class MainActivity extends AppCompatActivity {
                                 });
                                 if (s.lastIndexOf("http:", 0) == 0) {
                                     DOWNLOAD3(s, NomeFile);
+                                    showError("Download http " + s + " NomeFile: " + NomeFile);
                                 } else {
                                     DOWNLOAD3(baseUrl + "/totem/media/" + s, NomeFile);
+                                    showError("Download " + baseUrl + "/totem/media/" + s + " NomeFile: " + NomeFile);
                                 }
 //                                }
                             } else {
