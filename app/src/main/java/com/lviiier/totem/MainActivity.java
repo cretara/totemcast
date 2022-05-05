@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.StatFs;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,6 +32,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.stericson.RootTools.RootTools;
 import com.stericson.RootTools.execution.CommandCapture;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -47,7 +55,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Timer;
@@ -60,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     boolean ConnessioneAttiva = false;
     String baseUrl = "http://pediatotem.it";
     String paginatotem = baseUrl + "/pediacast/index.html";
+    String urlsetresult = "http://pediatotem.it/totem/getdata.php";
     String sottopagina = "totem";
 
     private NPrinterLib objLib;
@@ -93,6 +104,43 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet httpGet = new HttpGet(urlsetresult);
+                    HttpResponse httpResponse = client.execute(httpGet);
+                    HttpEntity httpEntity = httpResponse.getEntity();
+                    String response = EntityUtils.toString(httpEntity);
+                    Log.i("response", response);
+                    response = response.replaceAll("\"", "");
+
+                    SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
+                    Date dataServer = sf.parse(response);
+                    Log.i("responsePulito", response);
+
+                    String commandStr = "date " + (dataServer.getTime() / 1000) + "\n";
+
+                    Log.i("comando inviato", commandStr);
+                    runAsRoot(commandStr);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (savedInstanceState != null) {
             //importante anti doppio
             System.exit(2);
@@ -450,6 +498,7 @@ public class MainActivity extends AppCompatActivity {
             CommandCapture command = new CommandCapture(0, commandStr);
             RootTools.getShell(true).add(command).waitForFinish();
         } catch (Exception e) {
+            Log.e("Errore comando", e.getMessage());
             // something went wrong, deal with it here
         }
     }
