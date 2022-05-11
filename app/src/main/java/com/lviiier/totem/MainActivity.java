@@ -546,6 +546,7 @@ public class MainActivity extends AppCompatActivity {
             URL url = new URL(aurl);
             URLConnection conexion = url.openConnection();
             conexion.connect();
+            showError("Url: " + url.toString());
             int lenghtOfFile = conexion.getContentLength();
 //            Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
             InputStream input = new BufferedInputStream(url.openStream());
@@ -681,10 +682,10 @@ public class MainActivity extends AppCompatActivity {
                                 });
                                 if (s.lastIndexOf("http:", 0) == 0) {
                                     DOWNLOAD3(s, NomeFile);
-                                    showError("Download http " + s + " NomeFile: " + NomeFile);
+                                    showError("if true Download http: " + s + "; NomeFile: " + NomeFile);
                                 } else {
                                     DOWNLOAD3(baseUrl + "/totem/media/" + s, NomeFile);
-                                    showError("Download " + baseUrl + "/totem/media/" + s + " NomeFile: " + NomeFile);
+                                    showError("Download " + baseUrl + "/totem/media/" + s + "; NomeFile: " + NomeFile);
                                 }
 //                                }
                             } else {
@@ -753,6 +754,7 @@ public class MainActivity extends AppCompatActivity {
             socketServerThread.start();
         }
     }
+
 
     private class SocketServerReplyThread extends Thread {
         private Socket hostThreadSocket;
