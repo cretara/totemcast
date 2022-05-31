@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
     String mStrPrinter = "PRT001";
 
 
-
     WebView myWebView;
     ServerSocket serverSocket;
     ServerSocket serverSocket2;
@@ -100,41 +99,43 @@ public class MainActivity extends AppCompatActivity {
     private GoogleApiClient client;
     public static int coont = 1;
     // final MediaPlayer mp = MediaPlayer.create(this, R.raw.aaa);
+    boolean isGetDataResponseOk = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-
-                    HttpClient client = new DefaultHttpClient();
-                    HttpGet httpGet = new HttpGet(urlsetresult);
-                    HttpResponse httpResponse = client.execute(httpGet);
-                    HttpEntity httpEntity = httpResponse.getEntity();
-                    String response = EntityUtils.toString(httpEntity);
-                    Log.i("response", response);
-                    response = response.replaceAll("\"", "");
-
-                    SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
-                    Date dataServer = sf.parse(response);
-                    Log.i("responsePulito", response);
-
-                    String commandStr = "date " + (dataServer.getTime() / 1000) + "\n";
-
-                    Log.i("comando inviato", commandStr);
-                    runAsRoot(commandStr);
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
+        final Thread thread = new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        do {
+                            try {
+                                HttpClient client = new DefaultHttpClient();
+                                HttpGet httpGet = new HttpGet(urlsetresult);
+                                HttpResponse httpResponse = client.execute(httpGet);
+                                HttpEntity httpEntity = httpResponse.getEntity();
+                                String response = EntityUtils.toString(httpEntity);
+                                showError("response: " + response);
+                                response = response.replaceAll("\"", "");
+                                SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
+                                Date dataServer = sf.parse(response);
+                                showError("responsePulito: " + response);
+                                String commandStr = "date " + (dataServer.getTime() / 1000) + "\n";
+                                showError("comando inviato: " + commandStr);
+                                runAsRoot(commandStr);
+                                isGetDataResponseOk = true;
+                            } catch (Exception e) {
+                                showError(e.getMessage());
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException interruptedException) {
+                                    interruptedException.printStackTrace();
+                                }
+                            }
+                        } while (!isGetDataResponseOk);
+                    }
+                });
         thread.start();
 
         try {
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         if (savedInstanceState != null) {
             //importante anti doppio
             System.exit(2);
@@ -198,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onLoadResource(WebView view, String url) {
                     if (url.indexOf("comando.php") > 0) {
-                         Toast.makeText (MainActivity.this, url, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, url, Toast.LENGTH_SHORT).show();
 
                         String NomeFile = url.split("comando.php")[1];
                         //    Toast.makeText (MainActivity.this, "comando" + NomeFile, Toast.LENGTH_SHORT).show();
@@ -219,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                     }
                     if (url.indexOf("stampa.php") > 0) {
-                         Toast.makeText (MainActivity.this, url, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, url, Toast.LENGTH_SHORT).show();
                         String NomeFile = url.split("stampa.php")[1];
                         s = com.lviiier.totem.UTFEncodingUtil.decodeUTF(NomeFile);
                         ArayMessaggio = s.split("~");
@@ -227,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                 Stampa(ArayMessaggio);
+                                Stampa(ArayMessaggio);
                             }
                         });
                     }
@@ -438,7 +440,6 @@ public class MainActivity extends AppCompatActivity {
             menu.setVisibility(View.INVISIBLE);
 
 
-
             //nasconde la barra in basso
             getWindow().getDecorView().setSystemUiVisibility(View.GONE);
 
@@ -503,6 +504,7 @@ public class MainActivity extends AppCompatActivity {
             // something went wrong, deal with it here
         }
     }
+
     /*    private Runnable aaa = new Runnable() {
             @Override
             public void run() {
